@@ -9,7 +9,7 @@ Adafruit_LSM303_Mag_Unified mag = Adafruit_LSM303_Mag_Unified(12345);
 Servo servoL;
 Servo servoR;
 
-const int DATAPOINTS = 8;
+const int DATAPOINTS = 4;
 
 const float activeZone = 2;
 
@@ -39,6 +39,9 @@ float derivativeL;
 
 float systemR;
 float systemL;
+
+float lastSystemR;
+float lastSystemL;
 
 int i = 0;
  
@@ -75,7 +78,6 @@ void loop(void)
   
   Serial.print("Compass Heading: ");
   Serial.println(heading);
-  Serial.println();
 
 
 
@@ -105,11 +107,6 @@ void loop(void)
     errorL = sumL/DATAPOINTS;
 
     i = 0;
-  }
-
-  //Prevent servo twitching when error is too small
-  if (errorR < activeZone) errorR = 0;
-  if (errorL < activeZone) errorL = 0;
 
   //Accumulate the error over a period of time (find area under the graph)
   if (errorR < integralActiveZone && errorR != 0) errorR_total += errorR;
@@ -145,6 +142,12 @@ void loop(void)
   if (systemL < 0) systemL = 0;
   else if (systemL > 90) systemL = 90;
 
+  }
+
+  //If the changes in system value is too small, the arduino will not change the system value (to prevent twitching)
+  if ((lastSystemR - systemR) > -activeZone && (lastSystemR - systemR) < activeZone) systemR = lastSystemR;
+  if ((lastSystemL - systemL) > -activeZone && (lastSystemL - systemL) < activeZone) systemL = lastSystemL;
+
   //Set servo power
   servoR.write(90 + systemR); //goes from 90 -> 180
   servoL.write(90 - systemL); //goes from 90 -> 0
@@ -152,9 +155,14 @@ void loop(void)
   //Use to find derivative value
   lastErrorR = errorR;
   lastErrorL = errorL;
+ 
+  //Use to take derivative of the system values
+  lastSystemR = systemR;
+  lastSystemL = systemL;
   
   Serial.println(systemR);
   Serial.println(systemL);
+  Serial.println("");
   
-  delay(20);
+  delay(10/DATAPOINTS);
 }
