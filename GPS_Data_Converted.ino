@@ -11,6 +11,10 @@ char c;       //Used to read the characters spewing from the GPS module
 char latitude_char[20] = {'\0'};
 char longitude_char[20] = {'\0'};
  
+float AngleDiff(float Lat1, float Lat2, float Long1, float Long2);
+void strConverter(char str[]);
+void clearGPS();
+
 void setup()  
 {
   Serial.begin(115200);  //Turn on the Serial Monitor
@@ -100,3 +104,11 @@ void strConverter(char str[]){ //Convert GPS data into something Google Earth ca
   str[strIndex] = ' ';
 }
 
+float AngleDiff(float Lat1, float Lat2, float Long1, float Long2)
+{
+    float dy = lat2 - lat1;
+    float dx = cosf(3.141592654/180*lat1)*(long2 - long1);
+    float angle = atan2f(dy, dx);
+
+    return angle;
+}
