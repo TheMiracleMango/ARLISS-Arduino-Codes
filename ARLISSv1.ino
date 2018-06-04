@@ -1,3 +1,5 @@
+//Make sure to incorporate the bearing calculating algorithm from GPS_Test.ino file. This program cannot generate correct coordinate bearing yet
+
 #include <Adafruit_GPS.h> //Load the GPS Library. Make sure you have installed the library form the adafruit site above
 #include <SoftwareSerial.h> //Load the Software Serial Library. This library in effect gives the arduino additional serial ports
 #include <Wire.h>
